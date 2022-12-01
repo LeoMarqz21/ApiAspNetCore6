@@ -1,4 +1,6 @@
-﻿using ApiAspNetCore6.Middlewares;
+﻿using ApiAspNetCore6.Filters;
+using ApiAspNetCore6.Middlewares;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -16,12 +18,23 @@ namespace ApiAspNetCore6
         //Services
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers()
-                .AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+            services.AddControllers(options =>
+            {
+                options.Filters.Add(typeof(ExceptionFilter));//filtro global
+            }).AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+            
             services.AddDbContext<ApplicationDbContext>((options) => {
                 options.UseSqlServer(Configuration.GetConnectionString("defaultConnection"));
             });
+
             services.AddEndpointsApiExplorer();
+
+            services.AddTransient<MyActionFilter>();
+
+            services.AddResponseCaching();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+
             services.AddSwaggerGen();
         }
 
@@ -39,7 +52,11 @@ namespace ApiAspNetCore6
             }
             app.UseHttpsRedirection();
             app.UseRouting();
+
+            app.UseResponseCaching();
+
             app.UseAuthorization();
+            
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }

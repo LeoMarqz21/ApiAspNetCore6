@@ -7,10 +7,5 @@
             //leomarqz
             return app.UseMiddleware<LoggerHttpResponse>();
         }
-
-        public void Test()
-        {
-
-        }
     }
 }

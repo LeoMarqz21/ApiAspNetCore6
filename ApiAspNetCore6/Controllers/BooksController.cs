@@ -1,4 +1,6 @@
 ﻿using ApiAspNetCore6.Entities;
+using ApiAspNetCore6.Filters;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,9 +45,18 @@ namespace ApiAspNetCore6.Controllers
         }
 
         [HttpGet("test/run")]
+        [ServiceFilter(typeof(MyActionFilter))]
         public ActionResult TestHeader([FromHeader] string nameApp, [FromQuery] string author)
         {
             return Ok(new { nameApp, author });
+        }
+
+        [HttpGet("get-uuid")]
+        [ResponseCache(Duration = 10)]
+        [Authorize]
+        public ActionResult<string> GetUUID()
+        {
+            return Guid.NewGuid().ToString();
         }
     }
 }
