@@ -1,5 +1,6 @@
 ﻿using ApiAspNetCore6.Filters;
 using ApiAspNetCore6.Middlewares;
+using ApiAspNetCore6.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -30,6 +31,10 @@ namespace ApiAspNetCore6
             services.AddEndpointsApiExplorer();
 
             services.AddTransient<MyActionFilter>();
+
+            //escribiria en un archivo cuando se inicia
+            //y cuando termina la aplicación
+            services.AddHostedService<WriteToFile>();
 
             services.AddResponseCaching();
 
