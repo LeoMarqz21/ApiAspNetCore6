@@ -1,4 +1,5 @@
 ﻿using ApiAspNetCore6.Validations;
+using System.ComponentModel.DataAnnotations;
 
 namespace ApiAspNetCore6.Entities
 {
@@ -6,8 +7,7 @@ namespace ApiAspNetCore6.Entities
     {
         public int Id { get; set; }
         [FirstLetterCapitalized]
+        [StringLength(maximumLength: 250)]
         public string Title { get; set; }
-        public int AuthorId { get; set; }
-        public Author Author { get; set; }
     }
 }

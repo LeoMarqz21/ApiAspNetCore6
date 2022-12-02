@@ -19,30 +19,30 @@ namespace ApiAspNetCore6.Controllers
             this.logger = logger;
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<Book>> Get(int id)
-        {
-            var book = await context.Books.Include(x => x.Author)
-                .FirstOrDefaultAsync(b => b.Id == id);
-            if (book is null)
-            {
-                return NotFound();
-            }
-            return book;
-        }
+        //[HttpGet("{id:int}")]
+        //public async Task<ActionResult<Book>> Get(int id)
+        //{
+        //    var book = await context.Books.Include(x => x.Author)
+        //        .FirstOrDefaultAsync(b => b.Id == id);
+        //    if (book is null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return book;
+        //}
 
-        [HttpPost]
-        public async Task<ActionResult> Create(Book book)
-        {
-            var existAuthor = await context.Authors.AnyAsync(a => a.Id == book.AuthorId);
-            if (!existAuthor)
-            {
-                return BadRequest($"No existe un autor con id:[{book.AuthorId}]");
-            }
-            context.Add(book);
-            await context.SaveChangesAsync();
-            return Ok("Libro agregado");
-        }
+        //[HttpPost]
+        //public async Task<ActionResult> Create(Book book)
+        //{
+        //    var existAuthor = await context.Authors.AnyAsync(a => a.Id == book.AuthorId);
+        //    if (!existAuthor)
+        //    {
+        //        return BadRequest($"No existe un autor con id:[{book.AuthorId}]");
+        //    }
+        //    context.Add(book);
+        //    await context.SaveChangesAsync();
+        //    return Ok("Libro agregado");
+        //}
 
     }
 }
