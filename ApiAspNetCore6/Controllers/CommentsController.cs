@@ -22,12 +22,14 @@ namespace ApiAspNetCore6.Controllers
         [HttpGet]
         public async Task<ActionResult<List<DisplayComment>>> GetAll(int bookId)
         {
-            var bookExist = await context.Books.AnyAsync(book => book.Id == bookId);
+            var bookExist = await context.Books
+                .AnyAsync(book => book.Id == bookId);
             if (!bookExist)
             {
                 return NotFound();
             }
-            var comments = await context.Comments.Where(comment=>comment.BookId == bookId).ToListAsync();
+            var comments = await context.Comments
+                .Where(comment=>comment.BookId == bookId).ToListAsync();
             return mapper.Map<List<DisplayComment>>(comments);
         }
 

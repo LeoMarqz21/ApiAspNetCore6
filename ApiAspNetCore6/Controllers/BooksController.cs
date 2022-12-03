@@ -28,6 +28,8 @@ namespace ApiAspNetCore6.Controllers
         public async Task<ActionResult<DisplayBook>> Get(int id)
         {
             var book = await context.Books
+                .Include(book=>book.AuthorsBooks)
+                .ThenInclude(authorBook => authorBook.Author)
                 .FirstOrDefaultAsync(b => b.Id == id);
             if (book is null)
             {
@@ -47,12 +49,26 @@ namespace ApiAspNetCore6.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(CreateBook createBook)
         {
-            //var existAuthor = await context.Authors.AnyAsync(a => a.Id == createBook.AuthorId);
-            //if (!existAuthor)
-            //{
-            //    return BadRequest($"No existe un autor con id:[{createBook.AuthorId}]");
-            //}
+            if(createBook.AuthorsIds == null)
+            {
+                return BadRequest("No se puede crear un libro sin autores");
+            }
+            var authorsIds = await context.Authors
+                .Where(author => createBook.AuthorsIds.Contains(author.Id))
+                .Select(author => author.Id)
+                .ToListAsync();
+            if(createBook.AuthorsIds.Count != authorsIds.Count)
+            {
+                return BadRequest("No existe uno de los autores enviados");
+            }
             var book = mapper.Map<Book>(createBook);
+            if(book is not null)
+            {
+                for (int i = 0; i < book.AuthorsBooks.Count; i++)
+                {
+                    book.AuthorsBooks[i].Order = i;
+                }
+            }
             context.Add(book);
             await context.SaveChangesAsync();
             return Ok("Libro agregado");
