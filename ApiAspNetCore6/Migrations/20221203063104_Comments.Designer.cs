@@ -3,6 +3,7 @@ using ApiAspNetCore6;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiAspNetCore6.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221203063104_Comments")]
+    partial class Comments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,24 +39,6 @@ namespace ApiAspNetCore6.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Authors");
-                });
-
-            modelBuilder.Entity("ApiAspNetCore6.Entities.AuthorBook", b =>
-                {
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BookId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.HasKey("AuthorId", "BookId");
-
-                    b.HasIndex("BookId");
-
-                    b.ToTable("AuthorsBooks");
                 });
 
             modelBuilder.Entity("ApiAspNetCore6.Entities.Book", b =>
@@ -96,25 +80,6 @@ namespace ApiAspNetCore6.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("ApiAspNetCore6.Entities.AuthorBook", b =>
-                {
-                    b.HasOne("ApiAspNetCore6.Entities.Author", "Author")
-                        .WithMany("AuthorsBooks")
-                        .HasForeignKey("AuthorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ApiAspNetCore6.Entities.Book", "Book")
-                        .WithMany("AuthorsBooks")
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Author");
-
-                    b.Navigation("Book");
-                });
-
             modelBuilder.Entity("ApiAspNetCore6.Entities.Comment", b =>
                 {
                     b.HasOne("ApiAspNetCore6.Entities.Book", "Book")
@@ -126,15 +91,8 @@ namespace ApiAspNetCore6.Migrations
                     b.Navigation("Book");
                 });
 
-            modelBuilder.Entity("ApiAspNetCore6.Entities.Author", b =>
-                {
-                    b.Navigation("AuthorsBooks");
-                });
-
             modelBuilder.Entity("ApiAspNetCore6.Entities.Book", b =>
                 {
-                    b.Navigation("AuthorsBooks");
-
                     b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
