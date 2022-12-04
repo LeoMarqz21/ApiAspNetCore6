@@ -19,6 +19,17 @@ namespace ApiAspNetCore6.Controllers
             this.mapper = mapper;
         }
 
+        [HttpGet("{id:int}", Name = "GetComment")]
+        public async Task<ActionResult<DisplayComment>> FindById(int id)
+        {
+            var comment = await context.Comments.FirstOrDefaultAsync(comment=> comment.Id == id);
+            if(comment is null)
+            {
+                return NotFound();
+            }
+            return mapper.Map<DisplayComment>(comment);
+        }
+
         [HttpGet]
         public async Task<ActionResult<List<DisplayComment>>> GetAll(int bookId)
         {
@@ -45,7 +56,8 @@ namespace ApiAspNetCore6.Controllers
             comment.BookId = bookId;
             context.Add(comment);
             await context.SaveChangesAsync();
-            return Ok();
+            var displayComment = mapper.Map<DisplayComment>(comment);
+            return CreatedAtRoute("GetComment", new {id=comment.Id, bookId = comment.BookId}, displayComment);
         }
     }
 }

@@ -24,8 +24,8 @@ namespace ApiAspNetCore6.Controllers
         }
 
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<DisplayBook>> Get(int id)
+        [HttpGet("{id:int}", Name = "GetBook")]
+        public async Task<ActionResult<DisplayBookWithAuthors>> FindById(int id)
         {
             var book = await context.Books
                 .Include(book=>book.AuthorsBooks)
@@ -35,7 +35,8 @@ namespace ApiAspNetCore6.Controllers
             {
                 return NotFound();
             }
-            return mapper.Map<DisplayBook>(book);
+            book.AuthorsBooks = book.AuthorsBooks.OrderBy(b=>b.Order).ToList();
+            return mapper.Map<DisplayBookWithAuthors>(book);
         }
 
         [HttpGet]
@@ -71,7 +72,8 @@ namespace ApiAspNetCore6.Controllers
             }
             context.Add(book);
             await context.SaveChangesAsync();
-            return Ok("Libro agregado");
+            var displayBook = mapper.Map<DisplayBook>(book);
+            return CreatedAtRoute("GetBook", new {id=book.Id}, displayBook);
         }
 
     }

@@ -21,17 +21,19 @@ namespace ApiAspNetCore6.Controllers
             this.mapper = mapper;
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<DisplayAuthor>> Get([FromRoute] int id)
+        [HttpGet("{id:int}", Name = "GetAuthor")]
+        public async Task<ActionResult<DisplayAuthorWithBooks>> FindById([FromRoute] int id)
         {
             var author = await context.Authors
+                .Include(author=>author.AuthorsBooks)
+                .ThenInclude(authorBook=>authorBook.Book)
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (author is null)
             {
                 logger.LogInformation("INFORMATION: /authors/id:int --> author no encontrado");
                 return NotFound();
             }
-            return mapper.Map<DisplayAuthor>(author);
+            return mapper.Map<DisplayAuthorWithBooks>(author);
         }
 
         [HttpGet("{name}")]
@@ -64,7 +66,8 @@ namespace ApiAspNetCore6.Controllers
             var author = mapper.Map<Author>(createAuthor);
             context.Add(author);
             await context.SaveChangesAsync();
-            return Ok();
+            var displayAuthor = mapper.Map<DisplayAuthor>(author);
+            return CreatedAtRoute("GetAuthor", new { id = author.Id }, displayAuthor);
         }
 
         [HttpPut("{id:int}")]
