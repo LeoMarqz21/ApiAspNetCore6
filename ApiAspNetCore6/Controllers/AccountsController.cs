@@ -13,20 +13,26 @@ namespace ApiAspNetCore6.Controllers
     public class AccountsController : Controller
     {
         private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<IdentityUser> signInManager;
         private readonly IConfiguration configuration;
 
-        public AccountsController(UserManager<IdentityUser> userManager, IConfiguration configuration)
+        public AccountsController(
+            UserManager<IdentityUser> userManager, 
+            SignInManager<IdentityUser> signInManager,
+            IConfiguration configuration
+            )
         {
             this.userManager = userManager;
+            this.signInManager = signInManager;
             this.configuration = configuration;
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<AuthenticationResponse>> Register(UserCredentialsRegister userCredentials)
+        public async Task<ActionResult<AuthenticationResponse>> Register(UserCredentials userCredentials)
         {
             var user = new IdentityUser
             {
-                UserName = userCredentials.UserName,
+                UserName = userCredentials.Email,
                 Email = userCredentials.Email,
             };
             var result = await userManager.CreateAsync(user, userCredentials.Password);
@@ -39,12 +45,31 @@ namespace ApiAspNetCore6.Controllers
             }
         }
 
-        private AuthenticationResponse CreateToken(UserCredentialsRegister userCredentialsRegister)
+        [HttpPost("login")]
+        public async Task<ActionResult<AuthenticationResponse>> Login(UserCredentials userCredentials)
+        {
+            var result = await signInManager
+                .PasswordSignInAsync(
+                userCredentials.Email,
+                userCredentials.Password,
+                isPersistent: false,
+                lockoutOnFailure: false
+                );
+            if(result.Succeeded)
+            {
+                return CreateToken(userCredentials);
+            }
+            else
+            {
+                return BadRequest("Login incorrecto");
+            }
+        }
+
+        private AuthenticationResponse CreateToken(UserCredentials userCredentials)
         {
             var claims = new List<Claim>()
             {
-                new Claim("UserName", userCredentialsRegister.UserName),
-                new Claim("email", userCredentialsRegister.Email)
+                new Claim("email", userCredentials.Email)
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["jwtkey"]));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
