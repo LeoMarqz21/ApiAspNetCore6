@@ -71,20 +71,18 @@ namespace ApiAspNetCore6.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult> Update([FromBody] Author author, [FromRoute] int id)
+        public async Task<ActionResult> Update([FromBody] UpdateAuthor updateAuthor, [FromRoute] int id)
         {
-            if (author.Id != id)
-            {
-                return BadRequest($"El id:[{author.Id}] de autor no coincide con el id:[{id}] de la url !!!");
-            }
             var exists = await context.Authors.AnyAsync(a => a.Id == id);
             if (!exists)
             {
                 return NotFound();
             }
+            var author = mapper.Map<Author>(updateAuthor);
+            author.Id = id;
             context.Update(author);
             await context.SaveChangesAsync();
-            return Ok("Autor agregado");
+            return NoContent();
         }
 
         [HttpDelete("{id:int}")]

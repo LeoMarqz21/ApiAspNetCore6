@@ -10,6 +10,7 @@ namespace ApiAspNetCore6.Utilities
         {
             CreateMap<CreateAuthor, Author>();
             CreateMap<Author, DisplayAuthor>();
+            CreateMap<UpdateAuthor, Author>();
             CreateMap<Author, DisplayAuthorWithBooks>()
                 .ForMember(
                 displayAuthor => displayAuthor.Books, 

@@ -22,7 +22,8 @@ namespace ApiAspNetCore6.Controllers
         [HttpGet("{id:int}", Name = "GetComment")]
         public async Task<ActionResult<DisplayComment>> FindById(int id)
         {
-            var comment = await context.Comments.FirstOrDefaultAsync(comment=> comment.Id == id);
+            var comment = await context.Comments
+                .FirstOrDefaultAsync(comment=> comment.Id == id);
             if(comment is null)
             {
                 return NotFound();
@@ -58,6 +59,27 @@ namespace ApiAspNetCore6.Controllers
             await context.SaveChangesAsync();
             var displayComment = mapper.Map<DisplayComment>(comment);
             return CreatedAtRoute("GetComment", new {id=comment.Id, bookId = comment.BookId}, displayComment);
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Update(UpdateComment updateComment, int bookId, int id)
+        {
+            var bookExist = await context.Books.AnyAsync(book => book.Id == bookId);
+            if (!bookExist)
+            {
+                return NotFound();
+            }
+            var commentExist = await context.Comments.AnyAsync(comment => comment.Id == id);
+            if(!commentExist)
+            {
+                return NotFound();
+            }
+            var comment = mapper.Map<Comment>(updateComment);
+            comment.Id = id;
+            comment.BookId = bookId;
+            context.Update(comment);
+            await context.SaveChangesAsync();
+            return NoContent();
         }
     }
 }
