@@ -20,9 +20,16 @@ namespace ApiAspNetCore6.Utilities
             CreateMap<CreateBook, Book>()
                 .ForMember(
                 book => book.AuthorsBooks, 
-                options => options.MapFrom(MapAuthorsBooks)
+                options => options.MapFrom(MapAuthorsBooks_Create)
                 );
             CreateMap<Book, DisplayBook>();
+            CreateMap<UpdateBook, Book>();
+            CreateMap<PatchBook, Book>().ReverseMap();
+            CreateMap<UpdateBook, Book>()
+                .ForMember(
+                book => book.AuthorsBooks,
+                options => options.MapFrom(MapAuthorsBooks_Update)
+                );
             CreateMap<Book, DisplayBookWithAuthors>()
                 .ForMember(
                 displayBook => displayBook.Authors, 
@@ -30,12 +37,13 @@ namespace ApiAspNetCore6.Utilities
                 );
 
             CreateMap<CreateComment, Comment>();
+            CreateMap<UpdateComment, Comment>();
             CreateMap<Comment, DisplayComment>();
         }
 
       
 
-        private List<AuthorBook> MapAuthorsBooks(CreateBook createBook, Book book)
+        private List<AuthorBook> MapAuthorsBooks_Create(CreateBook createBook, Book book)
         {
             var result = new List<AuthorBook>();
             if(createBook.AuthorsIds == null)
@@ -80,6 +88,20 @@ namespace ApiAspNetCore6.Utilities
                     Id = authorBook.BookId,
                     Title = authorBook.Book.Title
                 });
+            }
+            return result;
+        }
+
+        private List<AuthorBook> MapAuthorsBooks_Update(UpdateBook updateBook, Book book)
+        {
+            var result = new List<AuthorBook>();
+            if (updateBook.AuthorsIds == null)
+            {
+                return result;
+            }
+            foreach (var authorId in updateBook.AuthorsIds)
+            {
+                result.Add(new AuthorBook() { AuthorId = authorId });
             }
             return result;
         }

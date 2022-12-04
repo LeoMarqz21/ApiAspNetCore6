@@ -3,13 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ApiAspNetCore6.DTOs
 {
-    public class CreateBook
+    public class PatchBook
     {
-        [Required(ErrorMessage = "El campo {0} es requerido")]
+        [Required]
         [FirstLetterCapitalized]
         [StringLength(maximumLength: 250)]
         public string Title { get; set; }
-        public List<int> AuthorsIds { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }
