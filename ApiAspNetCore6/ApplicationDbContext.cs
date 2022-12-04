@@ -1,9 +1,10 @@
 ﻿using ApiAspNetCore6.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiAspNetCore6
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext
     {
         public ApplicationDbContext(DbContextOptions options)
         : base(options)
@@ -13,6 +14,7 @@ namespace ApiAspNetCore6
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
             //definicion de llave compuesta
             modelBuilder.Entity<AuthorBook>()
                 .HasKey(ab => new { ab.AuthorId, ab.BookId });

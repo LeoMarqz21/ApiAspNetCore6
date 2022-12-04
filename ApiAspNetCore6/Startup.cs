@@ -1,6 +1,7 @@
 ﻿using ApiAspNetCore6.Filters;
 using ApiAspNetCore6.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -39,6 +40,10 @@ namespace ApiAspNetCore6
             services.AddSwaggerGen();
 
             services.AddAutoMapper(typeof(Startup));
+
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
         }
 
         //Middlewares

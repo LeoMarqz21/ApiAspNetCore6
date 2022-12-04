@@ -1,6 +1,8 @@
 ﻿using ApiAspNetCore6.DTOs;
 using ApiAspNetCore6.Entities;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,6 +50,7 @@ namespace ApiAspNetCore6.Controllers
         }
 
         [HttpGet]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<DisplayAuthor>>> GetAll()
         {
             var authors = await context.Authors.ToListAsync();
@@ -95,7 +98,7 @@ namespace ApiAspNetCore6.Controllers
             }
             context.Remove(new Author { Id = id });
             await context.SaveChangesAsync();
-            return Ok("Autor eliminado exitosamente");
+            return NoContent();
         }
     }
 }

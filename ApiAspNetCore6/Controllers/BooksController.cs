@@ -111,6 +111,19 @@ namespace ApiAspNetCore6.Controllers
             return NoContent();
         }
 
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete([FromRoute] int id)
+        {
+            var exists = await context.Books.AnyAsync(a => a.Id == id);
+            if (!exists)
+            {
+                return NotFound();
+            }
+            context.Remove(new Book { Id = id });
+            await context.SaveChangesAsync();
+            return NoContent();
+        }
+
         private void SortAuthorsInABook(Book book)
         {
             if (book is not null)
