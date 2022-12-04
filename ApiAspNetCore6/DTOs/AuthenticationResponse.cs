@@ -10,6 +10,4 @@
         public DateTime Expires { get; set; }
 
     }
-
-    }
 }
