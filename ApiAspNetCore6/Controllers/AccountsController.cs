@@ -1,4 +1,5 @@
 ﻿using ApiAspNetCore6.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -28,6 +29,7 @@ namespace ApiAspNetCore6.Controllers
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<ActionResult<AuthenticationResponse>> Register(UserCredentials userCredentials)
         {
             var user = new IdentityUser
@@ -46,6 +48,7 @@ namespace ApiAspNetCore6.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<ActionResult<AuthenticationResponse>> Login(UserCredentials userCredentials)
         {
             var result = await signInManager

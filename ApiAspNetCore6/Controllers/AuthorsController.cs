@@ -10,6 +10,7 @@ namespace ApiAspNetCore6.Controllers
 {
     [ApiController]
     [Route("api/authors")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AuthorsController : ControllerBase
     {
         private readonly ApplicationDbContext context;
@@ -50,7 +51,6 @@ namespace ApiAspNetCore6.Controllers
         }
 
         [HttpGet]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<DisplayAuthor>>> GetAll()
         {
             var authors = await context.Authors.ToListAsync();

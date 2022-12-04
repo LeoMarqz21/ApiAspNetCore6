@@ -2,6 +2,7 @@
 using ApiAspNetCore6.Entities;
 using ApiAspNetCore6.Filters;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ namespace ApiAspNetCore6.Controllers
 {
     [ApiController]
     [Route("api/books")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class BooksController : Controller
     {
         private readonly ApplicationDbContext context;
