@@ -102,6 +102,10 @@ namespace ApiAspNetCore6
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("IsAdmin", policy => policy.RequireClaim("IsAdmin"));
+            });
         }
 
         //Middlewares

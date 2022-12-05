@@ -10,7 +10,7 @@ namespace ApiAspNetCore6.Controllers
 {
     [ApiController]
     [Route("api/authors")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
     public class AuthorsController : ControllerBase
     {
         private readonly ApplicationDbContext context;
