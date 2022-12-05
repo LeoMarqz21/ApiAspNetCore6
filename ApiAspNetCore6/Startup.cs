@@ -31,8 +31,9 @@ namespace ApiAspNetCore6
                 options.Filters.Add(typeof(ExceptionFilter));//filtro global
             }).AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles)
             .AddNewtonsoftJson();
-            
-            services.AddDbContext<ApplicationDbContext>((options) => {
+
+            services.AddDbContext<ApplicationDbContext>((options) =>
+            {
                 options.UseSqlServer(Configuration.GetConnectionString("defaultConnection"));
             });
 
@@ -92,7 +93,7 @@ namespace ApiAspNetCore6
                             }
                         },
                         new string[]{}
-                    } 
+                    }
                 });
 
             });
@@ -102,9 +103,27 @@ namespace ApiAspNetCore6
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("IsAdmin", policy => policy.RequireClaim("IsAdmin"));
+            });
+
+            //investifar para que sirve
+            services.AddDataProtection();
+
+            //cors - permite conexion de diferentes origenes
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    //builder.WithOrigins("https://www.apirequest.io") ejemplo
+                    builder.WithOrigins("https://www.apirequest.io")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+                    //sirve para exponer cabeceras de retorno
+                    //.WithExposedHeaders();
+                });
             });
         }
 
@@ -121,12 +140,15 @@ namespace ApiAspNetCore6
                 app.UseSwaggerUI();
             }
             app.UseHttpsRedirection();
+
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseResponseCaching();
 
             app.UseAuthorization();
-            
+
             app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }

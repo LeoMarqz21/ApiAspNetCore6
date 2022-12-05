@@ -41,7 +41,7 @@ namespace ApiAspNetCore6.Controllers
             var result = await userManager.CreateAsync(user, userCredentials.Password);
             if(result.Succeeded)
             {
-                return CreateToken(userCredentials);
+                return await CreateToken(userCredentials);
             }else
             {
                 return BadRequest(result.Errors);
