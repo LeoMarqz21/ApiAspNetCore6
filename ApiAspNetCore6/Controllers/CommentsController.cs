@@ -3,6 +3,7 @@ using ApiAspNetCore6.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,11 +16,13 @@ namespace ApiAspNetCore6.Controllers
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
+        private readonly UserManager<IdentityUser> userManager;
 
-        public CommentsController(ApplicationDbContext context, IMapper mapper)
+        public CommentsController(ApplicationDbContext context, IMapper mapper, UserManager<IdentityUser> userManager)
         {
             this.context = context;
             this.mapper = mapper;
+            this.userManager = userManager;
         }
 
         [HttpGet("{id:int}", Name = "GetComment")]
@@ -51,6 +54,10 @@ namespace ApiAspNetCore6.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(int bookId, CreateComment createComment)
         {
+            var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
+            var email = emailClaim.Value;
+            var identityUser = await userManager.FindByEmailAsync(email);
+            var userId = identityUser.Id;
             var bookExist = await context.Books.AnyAsync(book=>book.Id == bookId);
             if(!bookExist)
             {
@@ -58,6 +65,7 @@ namespace ApiAspNetCore6.Controllers
             }
             var comment = mapper.Map<Comment>(createComment);
             comment.BookId = bookId;
+            comment.UserId = userId;
             context.Add(comment);
             await context.SaveChangesAsync();
             var displayComment = mapper.Map<DisplayComment>(comment);

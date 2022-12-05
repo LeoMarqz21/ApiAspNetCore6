@@ -1,4 +1,6 @@
-﻿namespace ApiAspNetCore6.Entities
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace ApiAspNetCore6.Entities
 {
     public class Comment
     {
@@ -6,5 +8,7 @@
         public string Content { get; set; }
         public int BookId { get; set; }
         public Book Book { get; set; }
+        public string UserId { get; set; }
+        public IdentityUser User { get; set; }
     }
 }

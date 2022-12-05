@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -15,7 +16,9 @@ namespace ApiAspNetCore6
     {
         public Startup(IConfiguration configuration)
         {
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             Configuration = configuration;
+
         }
 
         public IConfiguration Configuration { get; }
