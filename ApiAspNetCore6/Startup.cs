@@ -1,5 +1,6 @@
 ﻿using ApiAspNetCore6.Filters;
 using ApiAspNetCore6.Middlewares;
+using ApiAspNetCore6.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -125,6 +126,8 @@ namespace ApiAspNetCore6
                     //.WithExposedHeaders();
                 });
             });
+
+            services.AddTransient<HashService>();
         }
 
         //Middlewares

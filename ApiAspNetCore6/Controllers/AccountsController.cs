@@ -1,4 +1,5 @@
 ﻿using ApiAspNetCore6.DTOs;
+using ApiAspNetCore6.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
@@ -18,18 +19,21 @@ namespace ApiAspNetCore6.Controllers
         private readonly UserManager<IdentityUser> userManager;
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly IConfiguration configuration;
+        private readonly HashService hashService;
         private readonly IDataProtector dataProtector;
 
         public AccountsController(
             UserManager<IdentityUser> userManager, 
             SignInManager<IdentityUser> signInManager,
             IConfiguration configuration,
-            IDataProtectionProvider dataProtectionProvider
+            IDataProtectionProvider dataProtectionProvider,
+            HashService hashService
             )
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.configuration = configuration;
+            this.hashService = hashService;
             dataProtector = dataProtectionProvider.CreateProtector("valor_unico_y_secreto");
         }
 
@@ -158,6 +162,19 @@ namespace ApiAspNetCore6.Controllers
                 text = plainText,
                 encrypted = encryptedText,
                 uncrypted = uncryptedText
+            });
+        }
+
+        [HttpGet("hash/{text}")]
+        public ActionResult CreateHash(string text)
+        {
+            var result1 = hashService.Hash(text);
+            var result2 = hashService.Hash(text);
+            return Ok(new
+            {
+                text= text,
+                hash1 = result1,
+                hash2 = result2
             });
         }
 
