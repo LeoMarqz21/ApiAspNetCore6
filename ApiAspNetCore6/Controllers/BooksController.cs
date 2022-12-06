@@ -27,7 +27,7 @@ namespace ApiAspNetCore6.Controllers
         }
 
 
-        [HttpGet("{id:int}", Name = "GetBook")]
+        [HttpGet("{id:int}", Name = "getBookById")]
         public async Task<ActionResult<DisplayBookWithAuthors>> FindById(int id)
         {
             var book = await context.Books
@@ -42,7 +42,7 @@ namespace ApiAspNetCore6.Controllers
             return mapper.Map<DisplayBookWithAuthors>(book);
         }
 
-        [HttpGet]
+        [HttpGet(Name = "getBooks")]
         public async Task<ActionResult<List<DisplayBook>>> GetAll()
         {
             var books = await context.Books
@@ -50,7 +50,7 @@ namespace ApiAspNetCore6.Controllers
             return mapper.Map<List<DisplayBook>>(books);
         }
 
-        [HttpPost]
+        [HttpPost(Name = "createBook")]
         public async Task<ActionResult> Create(CreateBook createBook)
         {
             if(createBook.AuthorsIds == null)
@@ -70,10 +70,10 @@ namespace ApiAspNetCore6.Controllers
             context.Add(book);
             await context.SaveChangesAsync();
             var displayBook = mapper.Map<DisplayBook>(book);
-            return CreatedAtRoute("GetBook", new {id=book.Id}, displayBook);
+            return CreatedAtRoute("getBookById", new {id=book.Id}, displayBook);
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("{id:int}", Name = "updateBook")]
         public async Task<ActionResult> Update(int id, UpdateBook updateBook)
         {
             var book = await context.Books
@@ -89,7 +89,7 @@ namespace ApiAspNetCore6.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{id:int}")]
+        [HttpPatch("{id:int}", Name = "patchBook")]
         public async Task<ActionResult> Patch(int id, JsonPatchDocument<PatchBook> jsonPatchDocument)
         {
             if(jsonPatchDocument == null)
@@ -113,7 +113,7 @@ namespace ApiAspNetCore6.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:int}", Name = "deleteBook")]
         public async Task<ActionResult> Delete([FromRoute] int id)
         {
             var exists = await context.Books.AnyAsync(a => a.Id == id);

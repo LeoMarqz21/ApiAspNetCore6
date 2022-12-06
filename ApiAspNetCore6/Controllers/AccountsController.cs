@@ -37,7 +37,7 @@ namespace ApiAspNetCore6.Controllers
             dataProtector = dataProtectionProvider.CreateProtector("valor_unico_y_secreto");
         }
 
-        [HttpPost("register")]
+        [HttpPost("register", Name = "registerUser")]
         [AllowAnonymous]
         public async Task<ActionResult<AuthenticationResponse>> Register(UserCredentials userCredentials)
         {
@@ -56,7 +56,7 @@ namespace ApiAspNetCore6.Controllers
             }
         }
 
-        [HttpPost("login")]
+        [HttpPost("login", Name = "loginUser")]
         [AllowAnonymous]
         public async Task<ActionResult<AuthenticationResponse>> Login(UserCredentials userCredentials)
         {
@@ -77,7 +77,7 @@ namespace ApiAspNetCore6.Controllers
             }
         }
 
-        [HttpGet("renew-token")]
+        [HttpGet("renew-token", Name = "renewToken")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<AuthenticationResponse>> RenewToken()
         {
@@ -118,7 +118,7 @@ namespace ApiAspNetCore6.Controllers
 
         //-------------------------------------------------------------------------
 
-        [HttpPost("promote-to-admin")]
+        [HttpPost("promote-to-admin", Name = "promoteToAdmin")]
         public async Task<ActionResult> PromoteToAdmin(ProposedAdministrator admin)
         {
             var user = await userManager.FindByEmailAsync(admin.Email);
@@ -126,57 +126,57 @@ namespace ApiAspNetCore6.Controllers
             return NoContent();
         }
 
-        [HttpPost("revoke-admin")]
-        public async Task<ActionResult> RevokeAdmin(ProposedAdministrator admin)
+        [HttpPost("remove-admin", Name = "removeAdmin")]
+        public async Task<ActionResult> RemoveAdmin(ProposedAdministrator admin)
         {
             var user = await userManager.FindByEmailAsync(admin.Email);
             await userManager.RemoveClaimAsync(user, new Claim("IsAdmin", "1"));
             return NoContent();
         }
 
-        //ejemplo de encriptación
-        [HttpGet("encrypt")]
-        public ActionResult Encrypt()
-        {
-            var plainText = "Leo Marqz";
-            var encryptedText = dataProtector.Protect(plainText);
-            var uncryptedText = dataProtector.Unprotect(encryptedText);
-            return Ok(new
-            {
-                text = plainText,
-                encrypted = encryptedText,
-                uncrypted = uncryptedText
-            });
-        }
+        ////ejemplo de encriptación
+        //[HttpGet("encrypt")]
+        //public ActionResult Encrypt()
+        //{
+        //    var plainText = "Leo Marqz";
+        //    var encryptedText = dataProtector.Protect(plainText);
+        //    var uncryptedText = dataProtector.Unprotect(encryptedText);
+        //    return Ok(new
+        //    {
+        //        text = plainText,
+        //        encrypted = encryptedText,
+        //        uncrypted = uncryptedText
+        //    });
+        //}
         
-        [HttpGet("encrypt-by-time")]
-        public ActionResult EncryptByTime()
-        {
-            var timeLimitedProtector = dataProtector.ToTimeLimitedDataProtector();
-            var plainText = "Leo Marqz";
-            var encryptedText = timeLimitedProtector.Protect(plainText, lifetime: TimeSpan.FromSeconds(5));
-            Thread.Sleep(6000);
-            var uncryptedText = timeLimitedProtector.Unprotect(encryptedText);
-            return Ok(new
-            {
-                text = plainText,
-                encrypted = encryptedText,
-                uncrypted = uncryptedText
-            });
-        }
+        //[HttpGet("encrypt-by-time")]
+        //public ActionResult EncryptByTime()
+        //{
+        //    var timeLimitedProtector = dataProtector.ToTimeLimitedDataProtector();
+        //    var plainText = "Leo Marqz";
+        //    var encryptedText = timeLimitedProtector.Protect(plainText, lifetime: TimeSpan.FromSeconds(5));
+        //    Thread.Sleep(6000);
+        //    var uncryptedText = timeLimitedProtector.Unprotect(encryptedText);
+        //    return Ok(new
+        //    {
+        //        text = plainText,
+        //        encrypted = encryptedText,
+        //        uncrypted = uncryptedText
+        //    });
+        //}
 
-        [HttpGet("hash/{text}")]
-        public ActionResult CreateHash(string text)
-        {
-            var result1 = hashService.Hash(text);
-            var result2 = hashService.Hash(text);
-            return Ok(new
-            {
-                text= text,
-                hash1 = result1,
-                hash2 = result2
-            });
-        }
+        //[HttpGet("hash/{text}")]
+        //public ActionResult CreateHash(string text)
+        //{
+        //    var result1 = hashService.Hash(text);
+        //    var result2 = hashService.Hash(text);
+        //    return Ok(new
+        //    {
+        //        text= text,
+        //        hash1 = result1,
+        //        hash2 = result2
+        //    });
+        //}
 
     }
 }

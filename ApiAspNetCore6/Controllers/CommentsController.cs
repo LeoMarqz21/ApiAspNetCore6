@@ -25,7 +25,7 @@ namespace ApiAspNetCore6.Controllers
             this.userManager = userManager;
         }
 
-        [HttpGet("{id:int}", Name = "GetComment")]
+        [HttpGet("{id:int}", Name = "getCommentById")]
         public async Task<ActionResult<DisplayComment>> FindById(int id)
         {
             var comment = await context.Comments
@@ -37,7 +37,7 @@ namespace ApiAspNetCore6.Controllers
             return mapper.Map<DisplayComment>(comment);
         }
 
-        [HttpGet]
+        [HttpGet(Name = "getComments")]
         public async Task<ActionResult<List<DisplayComment>>> GetAll(int bookId)
         {
             var bookExist = await context.Books
@@ -51,7 +51,7 @@ namespace ApiAspNetCore6.Controllers
             return mapper.Map<List<DisplayComment>>(comments);
         }
 
-        [HttpPost]
+        [HttpPost(Name = "createComment")]
         public async Task<ActionResult> Create(int bookId, CreateComment createComment)
         {
             var emailClaim = HttpContext.User.Claims.Where(claim => claim.Type == "email").FirstOrDefault();
@@ -72,7 +72,7 @@ namespace ApiAspNetCore6.Controllers
             return CreatedAtRoute("GetComment", new {id=comment.Id, bookId = comment.BookId}, displayComment);
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("{id:int}", Name = "updateComment")]
         public async Task<ActionResult> Update(UpdateComment updateComment, int bookId, int id)
         {
             var bookExist = await context.Books.AnyAsync(book => book.Id == bookId);

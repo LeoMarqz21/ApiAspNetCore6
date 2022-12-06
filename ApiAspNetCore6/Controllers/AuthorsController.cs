@@ -24,7 +24,7 @@ namespace ApiAspNetCore6.Controllers
             this.mapper = mapper;
         }
 
-        [HttpGet("{id:int}", Name = "GetAuthor")]
+        [HttpGet("{id:int}", Name = "getAuthorById")]
         public async Task<ActionResult<DisplayAuthorWithBooks>> FindById([FromRoute] int id)
         {
             var author = await context.Authors
@@ -39,7 +39,7 @@ namespace ApiAspNetCore6.Controllers
             return mapper.Map<DisplayAuthorWithBooks>(author);
         }
 
-        [HttpGet("{name}")]
+        [HttpGet("{name}", Name = "getAuthorByName")]
         public async Task<ActionResult<List<DisplayAuthor>>> FindByName([FromRoute] string name = null)
         {
             List<Author> authors = await context.Authors.Where(author => author.Name.Contains(name)).ToListAsync();
@@ -50,7 +50,7 @@ namespace ApiAspNetCore6.Controllers
             return mapper.Map<List<DisplayAuthor>>(authors);
         }
 
-        [HttpGet]
+        [HttpGet(Name = "getAuthors")]
         public async Task<ActionResult<List<DisplayAuthor>>> GetAll()
         {
             var authors = await context.Authors.ToListAsync();
@@ -58,7 +58,7 @@ namespace ApiAspNetCore6.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost(Name = "createAuthor")]
         public async Task<ActionResult> Create([FromBody] CreateAuthor createAuthor)
         {
             var exists = await context.Authors.AnyAsync(x => x.Name == createAuthor.Name);
@@ -70,10 +70,10 @@ namespace ApiAspNetCore6.Controllers
             context.Add(author);
             await context.SaveChangesAsync();
             var displayAuthor = mapper.Map<DisplayAuthor>(author);
-            return CreatedAtRoute("GetAuthor", new { id = author.Id }, displayAuthor);
+            return CreatedAtRoute("GetAuthorById", new { id = author.Id }, displayAuthor);
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPut("{id:int}", Name = "updateAuthor")]
         public async Task<ActionResult> Update([FromBody] UpdateAuthor updateAuthor, [FromRoute] int id)
         {
             var exists = await context.Authors.AnyAsync(a => a.Id == id);
@@ -88,7 +88,7 @@ namespace ApiAspNetCore6.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id:int}", Name = "deleteAuthor")]
         public async Task<ActionResult> Delete([FromRoute] int id)
         {
             var exists = await context.Authors.AnyAsync(a => a.Id == id);
