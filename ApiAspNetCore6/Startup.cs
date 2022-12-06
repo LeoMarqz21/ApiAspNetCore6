@@ -109,7 +109,7 @@ namespace ApiAspNetCore6
                 options.AddPolicy("IsAdmin", policy => policy.RequireClaim("IsAdmin"));
             });
 
-            //investifar para que sirve
+            //sericio de proteccion de datos - encriptacion
             services.AddDataProtection();
 
             //cors - permite conexion de diferentes origenes

@@ -1,6 +1,7 @@
 ﻿using ApiAspNetCore6.DTOs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -17,16 +18,19 @@ namespace ApiAspNetCore6.Controllers
         private readonly UserManager<IdentityUser> userManager;
         private readonly SignInManager<IdentityUser> signInManager;
         private readonly IConfiguration configuration;
+        private readonly IDataProtector dataProtector;
 
         public AccountsController(
             UserManager<IdentityUser> userManager, 
             SignInManager<IdentityUser> signInManager,
-            IConfiguration configuration
+            IConfiguration configuration,
+            IDataProtectionProvider dataProtectionProvider
             )
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.configuration = configuration;
+            dataProtector = dataProtectionProvider.CreateProtector("valor_unico_y_secreto");
         }
 
         [HttpPost("register")]
@@ -124,6 +128,37 @@ namespace ApiAspNetCore6.Controllers
             var user = await userManager.FindByEmailAsync(admin.Email);
             await userManager.RemoveClaimAsync(user, new Claim("IsAdmin", "1"));
             return NoContent();
+        }
+
+        //ejemplo de encriptación
+        [HttpGet("encrypt")]
+        public ActionResult Encrypt()
+        {
+            var plainText = "Leo Marqz";
+            var encryptedText = dataProtector.Protect(plainText);
+            var uncryptedText = dataProtector.Unprotect(encryptedText);
+            return Ok(new
+            {
+                text = plainText,
+                encrypted = encryptedText,
+                uncrypted = uncryptedText
+            });
+        }
+        
+        [HttpGet("encrypt-by-time")]
+        public ActionResult EncryptByTime()
+        {
+            var timeLimitedProtector = dataProtector.ToTimeLimitedDataProtector();
+            var plainText = "Leo Marqz";
+            var encryptedText = timeLimitedProtector.Protect(plainText, lifetime: TimeSpan.FromSeconds(5));
+            Thread.Sleep(6000);
+            var uncryptedText = timeLimitedProtector.Unprotect(encryptedText);
+            return Ok(new
+            {
+                text = plainText,
+                encrypted = encryptedText,
+                uncrypted = uncryptedText
+            });
         }
 
     }
