@@ -22,7 +22,7 @@ namespace ApiAspNetCore6.Controllers
             this.context = context;
             this.logger = logger;
             this.mapper = mapper;
-        }
+        } 
 
         [HttpGet("{id:int}", Name = "getAuthorById")]
         public async Task<ActionResult<DisplayAuthorWithBooks>> FindById([FromRoute] int id)
