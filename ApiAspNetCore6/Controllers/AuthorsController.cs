@@ -16,16 +16,24 @@ namespace ApiAspNetCore6.Controllers
         private readonly ApplicationDbContext context;
         private readonly ILogger<AuthorsController> logger;
         private readonly IMapper mapper;
+        private readonly IAuthorizationService authorizationService;
 
-        public AuthorsController(ApplicationDbContext context, ILogger<AuthorsController> logger, IMapper mapper)
+        public AuthorsController(
+            ApplicationDbContext context, 
+            ILogger<AuthorsController> logger, 
+            IMapper mapper,
+            IAuthorizationService authorizationService
+            )
         {
             this.context = context;
             this.logger = logger;
             this.mapper = mapper;
+            this.authorizationService = authorizationService;
         } 
 
         [HttpGet("{id:int}", Name = "getAuthorById")]
-        public async Task<ActionResult<DisplayAuthorWithBooks>> FindById([FromRoute] int id)
+        [AllowAnonymous]
+        public async Task<ActionResult<DisplayAuthorWithBooks>> FindById([FromRoute] int id, [FromQuery] bool includeHATEOAS = false)
         {
             var author = await context.Authors
                 .Include(author=>author.AuthorsBooks)
@@ -36,7 +44,13 @@ namespace ApiAspNetCore6.Controllers
                 logger.LogInformation("INFORMATION: /authors/id:int --> author no encontrado");
                 return NotFound();
             }
-            return mapper.Map<DisplayAuthorWithBooks>(author);
+            var dto = mapper.Map<DisplayAuthorWithBooks>(author);
+            if(includeHATEOAS)
+            {
+                var isAdmin = await authorizationService.AuthorizeAsync(User, "IsAdmin");
+                GenerateLinks(dto, isAdmin.Succeeded);
+            }
+            return dto;
         }
 
         [HttpGet("{name}", Name = "getAuthorByName")]
@@ -51,10 +65,24 @@ namespace ApiAspNetCore6.Controllers
         }
 
         [HttpGet(Name = "getAuthors")]
-        public async Task<ActionResult<List<DisplayAuthor>>> GetAll()
+        [AllowAnonymous]
+        public async Task<ActionResult<ResourceCollection<DisplayAuthor>>> GetAll([FromQuery] bool includeHATEOAS = false)
         {
             var authors = await context.Authors.ToListAsync();
-            return mapper.Map<List<DisplayAuthor>>(authors);
+            var dtos = mapper.Map<List<DisplayAuthor>>(authors);
+            if(includeHATEOAS)
+            {
+                var isAdmin = await authorizationService.AuthorizeAsync(User, "IsAdmin");
+                dtos.ForEach(dto => GenerateLinks(dto, isAdmin.Succeeded));
+                var result = new ResourceCollection<DisplayAuthor> { Values = dtos };
+                result.Links.Add(new DataHATEOAS(Url.Link("createAuthor", new { }),"crear autor","POST"));
+                if(isAdmin.Succeeded)
+                {
+                    result.Links.Add(new DataHATEOAS(Url.Link("getAuthors", new { }), "obtener todos los autores", "GET"));
+                }
+                return Ok(result);
+            }
+            return Ok(dtos);
         }
 
 
@@ -99,6 +127,31 @@ namespace ApiAspNetCore6.Controllers
             context.Remove(new Author { Id = id });
             await context.SaveChangesAsync();
             return NoContent();
+        }
+
+        private void GenerateLinks(DisplayAuthor displayAuthor, bool isAdmin = false)
+        {
+            displayAuthor.Links.Add(
+                new DataHATEOAS(
+                    Url.Link("getAuthorById", new { id = displayAuthor.Id }),
+                    "Self",
+                    "GET"
+                    )
+                );
+            if(isAdmin)
+            {
+                displayAuthor.Links.Add(new DataHATEOAS(
+                    Url.Link("updateAuthor", new {id = displayAuthor.Id}),
+                    "actualizar autor",
+                    "PUT"
+                    ));
+                displayAuthor.Links.Add(new DataHATEOAS(
+                    Url.Link("deleteAuthor", new { id = displayAuthor.Id }),
+                    "eliminar autor",
+                    "DELETE"
+                    ));
+            }
+
         }
     }
 }
