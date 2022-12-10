@@ -129,29 +129,6 @@ namespace ApiAspNetCore6.Controllers
             return NoContent();
         }
 
-        private void GenerateLinks(DisplayAuthor displayAuthor, bool isAdmin = false)
-        {
-            displayAuthor.Links.Add(
-                new DataHATEOAS(
-                    Url.Link("getAuthorById", new { id = displayAuthor.Id }),
-                    "Self",
-                    "GET"
-                    )
-                );
-            if(isAdmin)
-            {
-                displayAuthor.Links.Add(new DataHATEOAS(
-                    Url.Link("updateAuthor", new {id = displayAuthor.Id}),
-                    "actualizar autor",
-                    "PUT"
-                    ));
-                displayAuthor.Links.Add(new DataHATEOAS(
-                    Url.Link("deleteAuthor", new { id = displayAuthor.Id }),
-                    "eliminar autor",
-                    "DELETE"
-                    ));
-            }
-
-        }
+       
     }
 }
